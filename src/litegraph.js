@@ -10284,7 +10284,7 @@ LGraphNode.prototype.executeAction = function(action)
 			var elem = document.createElement("div");
 			elem.className = "property";
 			elem.innerHTML = "<span class='property_name'></span><span class='property_value'></span>";
-			elem.querySelector(".property_name").innerText = name;
+			elem.querySelector(".property_name").innerText = options.label || name;
 			var value_element = elem.querySelector(".property_value");
 			value_element.innerText = str_value;
 			elem.dataset["property"] = name;
