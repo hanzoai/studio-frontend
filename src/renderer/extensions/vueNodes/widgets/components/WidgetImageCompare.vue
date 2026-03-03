@@ -32,8 +32,6 @@ import type { SimplifiedWidget } from '@/types/simplifiedWidget'
 
 import type { ImageCompareValue } from './widgetImageCompareTypes'
 
-export type { ImageCompareValue }
-
 // Image compare widgets typically don't have v-model, they display comparison
 const props = defineProps<{
   widget: SimplifiedWidget<ImageCompareValue | string>

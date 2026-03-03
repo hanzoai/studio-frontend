@@ -59,9 +59,7 @@ import {
   filterWidgetProps
 } from '@/utils/widgetPropFilter'
 
-import type { GalleryImage, GalleryValue } from './widgetGalleriaTypes'
-
-export type { GalleryImage, GalleryValue }
+import type { GalleryValue } from './widgetGalleriaTypes'
 
 const value = defineModel<GalleryValue>({ required: true })
 
