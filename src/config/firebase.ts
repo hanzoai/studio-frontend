@@ -4,25 +4,26 @@ import { isCloud } from '@/platform/distribution/types'
 import { remoteConfig } from '@/platform/remoteConfig/remoteConfig'
 
 const DEV_CONFIG: FirebaseOptions = {
-  apiKey: 'AIzaSyDa_YMeyzV0SkVe92vBZ1tVikWBmOU5KVE',
-  authDomain: 'dreamboothy-dev.firebaseapp.com',
-  databaseURL: 'https://dreamboothy-dev-default-rtdb.firebaseio.com',
-  projectId: 'dreamboothy-dev',
-  storageBucket: 'dreamboothy-dev.appspot.com',
-  messagingSenderId: '313257147182',
-  appId: '1:313257147182:web:be38f6ebf74345fc7618bf',
-  measurementId: 'G-YEVSMYXSPY'
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? '',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? '',
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL ?? '',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? '',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? '',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? '',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? '',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ?? ''
 }
 
 const PROD_CONFIG: FirebaseOptions = {
-  apiKey: 'AIzaSyC2-fomLqgCjb7ELwta1I9cEarPK8ziTGs',
-  authDomain: 'dreamboothy.firebaseapp.com',
-  databaseURL: 'https://dreamboothy-default-rtdb.firebaseio.com',
-  projectId: 'dreamboothy',
-  storageBucket: 'dreamboothy.appspot.com',
-  messagingSenderId: '357148958219',
-  appId: '1:357148958219:web:f5917f72e5f36a2015310e',
-  measurementId: 'G-3ZBD3MBTG4'
+  apiKey: import.meta.env.VITE_FIREBASE_PROD_API_KEY ?? '',
+  authDomain: import.meta.env.VITE_FIREBASE_PROD_AUTH_DOMAIN ?? '',
+  databaseURL: import.meta.env.VITE_FIREBASE_PROD_DATABASE_URL ?? '',
+  projectId: import.meta.env.VITE_FIREBASE_PROD_PROJECT_ID ?? '',
+  storageBucket: import.meta.env.VITE_FIREBASE_PROD_STORAGE_BUCKET ?? '',
+  messagingSenderId:
+    import.meta.env.VITE_FIREBASE_PROD_MESSAGING_SENDER_ID ?? '',
+  appId: import.meta.env.VITE_FIREBASE_PROD_APP_ID ?? '',
+  measurementId: import.meta.env.VITE_FIREBASE_PROD_MEASUREMENT_ID ?? ''
 }
 
 const BUILD_TIME_CONFIG = __USE_PROD_CONFIG__ ? PROD_CONFIG : DEV_CONFIG
