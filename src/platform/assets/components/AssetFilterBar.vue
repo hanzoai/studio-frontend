@@ -50,11 +50,9 @@ import { useAssetFilterOptions } from '@/platform/assets/composables/useAssetFil
 import type { AssetItem } from '@/platform/assets/schemas/assetSchema'
 import { cn } from '@/utils/tailwindUtil'
 
-export interface FilterState {
-  fileFormats: string[]
-  baseModels: string[]
-  sortBy: string
-}
+import type { FilterState } from './assetFilterBarTypes'
+
+export type { FilterState }
 
 const { assets = [] } = defineProps<{
   assets?: AssetItem[]
