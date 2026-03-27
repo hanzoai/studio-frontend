@@ -30,13 +30,9 @@ import { computed } from 'vue'
 
 import type { SimplifiedWidget } from '@/types/simplifiedWidget'
 
-export interface ImageCompareValue {
-  before: string
-  after: string
-  beforeAlt?: string
-  afterAlt?: string
-  initialPosition?: number
-}
+import type { ImageCompareValue } from './widgetImageCompareTypes'
+
+export type { ImageCompareValue }
 
 // Image compare widgets typically don't have v-model, they display comparison
 const props = defineProps<{

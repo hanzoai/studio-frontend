@@ -4,7 +4,7 @@ import { useFuse } from '@vueuse/integrations/useFuse'
 import type { UseFuseOptions } from '@vueuse/integrations/useFuse'
 
 import { d, t } from '@/i18n'
-import type { FilterState } from '@/platform/assets/components/AssetFilterBar.vue'
+import type { FilterState } from '@/platform/assets/components/assetFilterBarTypes'
 import type { AssetItem } from '@/platform/assets/schemas/assetSchema'
 import {
   getAssetBaseModel,

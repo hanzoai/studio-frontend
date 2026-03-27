@@ -8,7 +8,7 @@ import { createI18n } from 'vue-i18n'
 import type { SimplifiedWidget } from '@/types/simplifiedWidget'
 
 import WidgetGalleria from './WidgetGalleria.vue'
-import type { GalleryImage, GalleryValue } from './WidgetGalleria.vue'
+import type { GalleryImage, GalleryValue } from './widgetGalleriaTypes'
 
 const i18n = createI18n({
   legacy: false,

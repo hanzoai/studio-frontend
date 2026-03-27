@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
 import AssetFilterBar from '@/platform/assets/components/AssetFilterBar.vue'
-import type { FilterState } from '@/platform/assets/components/AssetFilterBar.vue'
+import type { FilterState } from '@/platform/assets/components/assetFilterBarTypes'
 import {
   createAssetWithSpecificBaseModel,
   createAssetWithSpecificExtension,
