@@ -3,6 +3,11 @@
   "version": "0.0.3",
   "type": "module",
   "scripts": {
+    "dev": "vite --config vite.config.mts",
+    "build": "vite build --config vite.config.mts",
+    "preview": "vite preview --config vite.config.mts",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src --cache",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build -o dist/storybook"
   },
