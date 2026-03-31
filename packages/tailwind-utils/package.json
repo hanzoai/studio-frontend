@@ -11,12 +11,6 @@
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
-  "nx": {
-    "tags": [
-      "scope:shared",
-      "type:util"
-    ]
-  },
   "dependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.2.0"
