@@ -13,10 +13,10 @@ This bootstraps the monorepo with dependencies, builds, tests, and dev server ve
 ## Quick Commands
 
 - `pnpm`: See all available commands
-- `pnpm dev`: Start development server (port 5173, via nx)
+- `pnpm dev`: Start development server (port 5173, via vite)
 - `pnpm typecheck`: Type checking
-- `pnpm build`: Build for production (via nx)
-- `pnpm lint`: Linting (via nx)
+- `pnpm build`: Build for production (via vite)
+- `pnpm lint`: Linting (oxlint + eslint)
 - `pnpm oxlint`: Fast Rust-based linting with Oxc
 - `pnpm format`: Prettier formatting
 - `pnpm test:unit`: Run all unit tests
@@ -27,17 +27,12 @@ This bootstraps the monorepo with dependencies, builds, tests, and dev server ve
 
 ## Monorepo Architecture
 
-The project now uses **Nx** for build orchestration and task management:
+The project uses **pnpm workspaces** for monorepo management. Scripts call tools directly:
 
-- **Task Orchestration**: Commands like `dev`, `build`, `lint`, and `test:browser` run via Nx
-- **Caching**: Nx provides intelligent caching for faster rebuilds
-- **Configuration**: Managed through `nx.json` with plugins for ESLint, Storybook, Vite, and Playwright
-- **Dependencies**: Nx handles dependency graph analysis and parallel execution
-
-Key Nx features:
-- Build target caching and incremental builds
-- Parallel task execution across the monorepo
-- Plugin-based architecture for different tools
+- **Build**: `vite build` (root and per-app configs)
+- **Dev**: `vite dev`
+- **Test**: `vitest` (unit), `playwright` (e2e)
+- **Storybook**: `storybook dev`
 
 ## Development Workflow
 

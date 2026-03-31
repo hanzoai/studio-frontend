@@ -6,11 +6,5 @@
   "type": "module",
   "exports": {
     ".": "./src/hanzoRegistryTypes.ts"
-  },
-  "nx": {
-    "tags": [
-      "scope:shared",
-      "type:types"
-    ]
   }
 }
