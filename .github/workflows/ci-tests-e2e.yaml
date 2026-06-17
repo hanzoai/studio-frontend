@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   setup:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     outputs:
       cache-key: ${{ steps.cache-key.outputs.key }}
     steps:
@@ -44,7 +44,7 @@ jobs:
   # Sharded chromium tests
   playwright-tests-chromium-sharded:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     permissions:
       contents: read
     strategy:
@@ -92,7 +92,7 @@ jobs:
     # Ideally, each shard runs test in 6 minutes, but allow up to 15 minutes
     timeout-minutes: 15
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     permissions:
       contents: read
     strategy:
@@ -142,7 +142,7 @@ jobs:
   # Merge sharded test reports
   merge-reports:
     needs: [playwright-tests-chromium-sharded]
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: ${{ !cancelled() }}
     steps:
       - name: Checkout repository
@@ -182,7 +182,7 @@ jobs:
 
   # Post starting comment for non-forked PRs
   comment-on-pr-start:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
     permissions:
       pull-requests: write
@@ -208,7 +208,7 @@ jobs:
   # Deploy and comment for non-forked PRs only
   deploy-and-comment:
     needs: [playwright-tests, merge-reports]
-    runs-on: ubuntu-latest
+    runs-on: hanzo-deploy-linux-amd64
     if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
     permissions:
       pull-requests: write

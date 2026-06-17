@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   lint-and-format:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - name: Checkout PR
         uses: actions/checkout@v5
