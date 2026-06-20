@@ -14,7 +14,7 @@ permissions:
 jobs:
   collect:
     if: github.repository == 'hanzo-studio/studio-frontend'
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
 
     steps:
       - uses: actions/checkout@v5

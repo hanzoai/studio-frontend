@@ -11,7 +11,7 @@ env:
 
 jobs:
   deploy-and-comment-forked-pr:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-deploy-linux-amd64
     if: |
       github.repository == 'hanzo-studio/studio-frontend' &&
       github.event.workflow_run.event == 'pull_request' &&
