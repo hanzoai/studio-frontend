@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   setup:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: >
       ( github.event_name == 'pull_request' && github.event.label.name == 'New Browser Test Expectations' ) ||
       ( github.event.issue.pull_request &&
@@ -80,7 +80,7 @@ jobs:
   # Sharded snapshot updates
   update-snapshots-sharded:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     strategy:
       fail-fast: false
       matrix:
@@ -184,7 +184,7 @@ jobs:
   # Merge snapshots and commit
   merge-and-commit:
     needs: [setup, update-snapshots-sharded]
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
