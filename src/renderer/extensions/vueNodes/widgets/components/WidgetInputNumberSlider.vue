@@ -2,7 +2,7 @@
   <WidgetLayoutField :widget="widget">
     <div :class="cn(WidgetInputBaseClass, 'flex items-center gap-2 pl-3 pr-2')">
       <Slider
-        :model-value="[modelValue]"
+        :model-value="modelValue"
         v-bind="filteredProps"
         class="flex-grow text-xs"
         :step="stepValue"
@@ -29,9 +29,9 @@
 
 <script setup lang="ts">
 import InputNumber from 'primevue/inputnumber'
+import Slider from 'primevue/slider'
 import { computed, ref } from 'vue'
 
-import Slider from '@/components/ui/slider/Slider.vue'
 import type { SimplifiedWidget } from '@/types/simplifiedWidget'
 import { cn } from '@/utils/tailwindUtil'
 import {
@@ -51,13 +51,14 @@ const modelValue = defineModel<number>({ default: 0 })
 
 const timesEmptied = ref(0)
 
-const updateLocalValue = (newValue: number[] | undefined): void => {
-  if (newValue?.length) modelValue.value = newValue[0]
+const updateLocalValue = (newValue: number | number[] | undefined): void => {
+  const next = Array.isArray(newValue) ? newValue[0] : newValue
+  if (next !== undefined) modelValue.value = next
 }
 
 const handleNumberInputUpdate = (newValue: number | undefined) => {
   if (newValue) {
-    updateLocalValue([newValue])
+    updateLocalValue(newValue)
     return
   }
   timesEmptied.value += 1
