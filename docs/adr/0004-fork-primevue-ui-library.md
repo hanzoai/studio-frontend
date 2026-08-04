@@ -50,7 +50,7 @@ We will **NOT** fork PrimeVue. After evaluation, forking was determined to be un
 
 - **Use PrimeVue as External Dependency**: Continue using PrimeVue as a standard npm dependency
 - **Targeted Workarounds**: Implement specific solutions for identified issues (coordinate system conflicts, scroll interference) without forking the entire library
-- **Selective Component Replacement**: Use libraries like shadcn/ui to replace specific problematic PrimeVue components and adjust them to match our design system
+- **No Vendored Components**: PrimeVue is the single component library. Third-party components are never copied into the tree (no shadcn/ui or equivalent generator); problematic components are fixed with targeted PrimeVue pass-through (`pt`) styling instead
 - **Upstream Engagement**: Continue engaging with PrimeVue community for feature requests and bug reports
 - **Maintain Flexibility**: Preserve ability to upgrade PrimeVue versions without fork maintenance overhead
 

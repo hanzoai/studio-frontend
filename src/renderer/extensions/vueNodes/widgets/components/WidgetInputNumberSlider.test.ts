@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
 import PrimeVue from 'primevue/config'
 import InputNumber from 'primevue/inputnumber'
+import Slider from 'primevue/slider'
 import { describe, expect, it } from 'vitest'
 
-import Slider from '@/components/ui/slider/Slider.vue'
 import type { SimplifiedWidget } from '@/types/simplifiedWidget'
 
 import WidgetInputNumberSlider from './WidgetInputNumberSlider.vue'
@@ -57,7 +57,7 @@ describe('WidgetInputNumberSlider Value Binding', () => {
       const wrapper = mountComponent(widget, 5)
 
       const slider = wrapper.findComponent({ name: 'Slider' })
-      expect(slider.props('modelValue')).toEqual([5])
+      expect(slider.props('modelValue')).toEqual(5)
     })
 
     it('handles different initial values', () => {
@@ -68,10 +68,10 @@ describe('WidgetInputNumberSlider Value Binding', () => {
       const wrapper2 = mountComponent(widget2, 10)
 
       const slider1 = wrapper1.findComponent({ name: 'Slider' })
-      expect(slider1.props('modelValue')).toEqual([5])
+      expect(slider1.props('modelValue')).toEqual(5)
 
       const slider2 = wrapper2.findComponent({ name: 'Slider' })
-      expect(slider2.props('modelValue')).toEqual([10])
+      expect(slider2.props('modelValue')).toEqual(10)
     })
   })
 
