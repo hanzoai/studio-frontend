@@ -1,0 +1,14 @@
+# Hanzo Studio front end (Vue + Vite, pnpm workspace). Published as a package and
+# bundled by the desktop app; this repo builds no image.
+#
+# Gate: install against the committed lockfile and run vue-tsc over the whole
+# workspace. A type error in a .vue SFC is the failure mode this codebase
+# actually has, and it is invisible to `vite build`, which transpiles without
+# checking types.
+test:
+  - name: typecheck
+    run: |
+      set -euo pipefail
+      corepack prepare pnpm@9.15.9 --activate
+      pnpm install --frozen-lockfile
+      pnpm typecheck
