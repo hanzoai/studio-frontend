@@ -79,8 +79,31 @@ jobs:
       - name: Publish if the tree is ahead of the registry
         working-directory: dist
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
+          KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
         run: |
+          # Only the KMS machine identity lives as a forge secret. A registry
+          # token beside it would be a second home for one thing, and the one
+          # that rots unwatched — nothing reads it until a release day.
+          if [ -z "${KMS_CLIENT_ID:-}" ] || [ -z "${KMS_CLIENT_SECRET:-}" ]; then
+            echo "::error::KMS machine identity absent — cannot pull the publish credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as git.hanzo.ai Actions secrets (org or repo scope)." >&2
+            exit 1
+          fi
+          KMS=https://kms.hanzo.ai; ENVN=prod
+          KT=$(curl -sf "$KMS/v1/kms/auth/login" -H 'Content-Type: application/json' \
+            -d "{\"clientId\":\"$KMS_CLIENT_ID\",\"clientSecret\":\"$KMS_CLIENT_SECRET\"}" | jq -r .accessToken)
+          [ -n "$KT" ] && [ "$KT" != null ] || { echo "::error::KMS login failed"; exit 1; }
+          URL="$KMS/v1/kms/secrets/NPM_TOKEN?env=$ENVN"
+          BODY=$(curl -s -w '\n%{http_code}' "$URL" -H "Authorization: Bearer $KT") || true
+          CODE=$(printf '%s' "$BODY" | tail -1)
+          NODE_AUTH_TOKEN=$(printf '%s' "$BODY" | sed '$d' | jq -r '.value // empty' 2>/dev/null || true)
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed NPM_TOKEN there, not as a forge secret." >&2
+            exit 1
+          fi
+          echo "::add-mask::$NODE_AUTH_TOKEN"
+          export NODE_AUTH_TOKEN
+
           NAME=$(jq -r .name package.json)
           NEW=$(jq -r .version package.json)
           OLD=$(curl -sf "https://registry.npmjs.org/${NAME/\//%2f}" \
@@ -160,8 +183,31 @@ jobs:
       - name: Publish if the tree is ahead of the registry
         working-directory: ${{ steps.pkg.outputs.dir }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
+          KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
         run: |
+          # Only the KMS machine identity lives as a forge secret. A registry
+          # token beside it would be a second home for one thing, and the one
+          # that rots unwatched — nothing reads it until a release day.
+          if [ -z "${KMS_CLIENT_ID:-}" ] || [ -z "${KMS_CLIENT_SECRET:-}" ]; then
+            echo "::error::KMS machine identity absent — cannot pull the publish credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as git.hanzo.ai Actions secrets (org or repo scope)." >&2
+            exit 1
+          fi
+          KMS=https://kms.hanzo.ai; ENVN=prod
+          KT=$(curl -sf "$KMS/v1/kms/auth/login" -H 'Content-Type: application/json' \
+            -d "{\"clientId\":\"$KMS_CLIENT_ID\",\"clientSecret\":\"$KMS_CLIENT_SECRET\"}" | jq -r .accessToken)
+          [ -n "$KT" ] && [ "$KT" != null ] || { echo "::error::KMS login failed"; exit 1; }
+          URL="$KMS/v1/kms/secrets/NPM_TOKEN?env=$ENVN"
+          BODY=$(curl -s -w '\n%{http_code}' "$URL" -H "Authorization: Bearer $KT") || true
+          CODE=$(printf '%s' "$BODY" | tail -1)
+          NODE_AUTH_TOKEN=$(printf '%s' "$BODY" | sed '$d' | jq -r '.value // empty' 2>/dev/null || true)
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed NPM_TOKEN there, not as a forge secret." >&2
+            exit 1
+          fi
+          echo "::add-mask::$NODE_AUTH_TOKEN"
+          export NODE_AUTH_TOKEN
+
           NAME=$(jq -r .name package.json)
           NEW=$(jq -r .version package.json)
           OLD=$(curl -sf "https://registry.npmjs.org/${NAME/\//%2f}" \
@@ -248,9 +294,37 @@ jobs:
           cp -r dist/* hanzo-studio_frontend_package/hanzo-studio_frontend_package/static/
           python -m build hanzo-studio_frontend_package
 
+      - name: Load the PyPI credential from KMS
+        if: steps.compare.outputs.publish == 'true'
+        env:
+          KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
+          KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
+        run: |
+          # Only the KMS machine identity lives as a forge secret. The action
+          # below takes the token as an input rather than an env var, so it is
+          # read here and handed over through the job env, masked.
+          if [ -z "${KMS_CLIENT_ID:-}" ] || [ -z "${KMS_CLIENT_SECRET:-}" ]; then
+            echo "::error::KMS machine identity absent — cannot pull the PyPI credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as git.hanzo.ai Actions secrets (org or repo scope)." >&2
+            exit 1
+          fi
+          KMS=https://kms.hanzo.ai; ENVN=prod
+          KT=$(curl -sf "$KMS/v1/kms/auth/login" -H 'Content-Type: application/json' \
+            -d "{\"clientId\":\"$KMS_CLIENT_ID\",\"clientSecret\":\"$KMS_CLIENT_SECRET\"}" | jq -r .accessToken)
+          [ -n "$KT" ] && [ "$KT" != null ] || { echo "::error::KMS login failed"; exit 1; }
+          URL="$KMS/v1/kms/secrets/PYPI_TOKEN?env=$ENVN"
+          BODY=$(curl -s -w '\n%{http_code}' "$URL" -H "Authorization: Bearer $KT") || true
+          CODE=$(printf '%s' "$BODY" | tail -1)
+          VAL=$(printf '%s' "$BODY" | sed '$d' | jq -r '.value // empty' 2>/dev/null || true)
+          if [ -z "$VAL" ]; then
+            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed PYPI_TOKEN there, not as a forge secret." >&2
+            exit 1
+          fi
+          echo "::add-mask::$VAL"
+          echo "PYPI_TOKEN=$VAL" >> "$GITHUB_ENV"
+
       - name: Publish package
         if: steps.compare.outputs.publish == 'true'
         uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
         with:
-          password: ${{ secrets.PYPI_TOKEN }}
+          password: ${{ env.PYPI_TOKEN }}
           packages-dir: hanzo-studio_frontend_package/dist
