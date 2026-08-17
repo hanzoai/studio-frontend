@@ -1,0 +1,256 @@
+name: Publish
+
+# The one thing here allowed to reach a registry.
+#
+# What this replaces had published nothing in the repo's history: three
+# workflow_dispatch-only files (release-npm-types, publish-desktop-ui,
+# release-pypi-dev) that each needed a human to type a version by hand, on
+# ubuntu-latest — a hosted runner this fleet does not have — and checked out
+# a git tag (refs/tags/vX.Y.Z) that has never once existed here. Zero tags,
+# zero releases, for as long as the repo has existed. hanzoai/ci's shared
+# build.yml, which this repo's own cicd.yml now runs on every push, does not
+# fill the gap either — it publishes images, generated API clients, release
+# binaries and static sites, and has no notion of an npm or PyPI package.
+#
+# Three packages, one shape: read the version already on disk, ask the
+# registry what it already serves, publish only if the tree is ahead. No
+# `paths:` filter — a lockfile-only fix to a failed release matches no path
+# and would not re-run the job it repaired. With no gate this is idempotent
+# by construction, which is also what makes the manual dispatch safe.
+#
+# The old PyPI workflow cut its own `.devN` suffix from a number typed at
+# dispatch time, with nowhere on disk recording which N came last. A push
+# has nobody standing by to type one, so that scheme is gone: all three
+# packages now publish the same version, straight from the workspace root's
+# package.json, and PyPI carries real releases instead of an unbounded dev
+# tail.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Serialized, newest wins. Two runs in flight both read a registry before
+# either writes to it, so both believe the same version is unpublished and
+# the slower one ships a stale tree under a number the faster one already
+# defined.
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+jobs:
+  # Publishes @hanzo-studio/studio-frontend-types. The publishable manifest
+  # lives at dist/package.json, written by scripts/prepare-types.js from the
+  # workspace root's name/version — there is no separate version to track.
+  types:
+    name: "@hanzo-studio/studio-frontend-types (npm)"
+    runs-on: hanzo-build-linux-amd64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # hanzo.yml's own test gate gets `corepack enable` for free from
+      # build.yml, the shared pipeline that runs it — this workflow isn't
+      # called through that pipeline, so it has to do both. packageManager
+      # isn't pinned in package.json either, so corepack has nothing to read
+      # a version off — pin it directly, same version hanzo.yml pins.
+      # COREPACK_NPM_REGISTRY keeps the pnpm tarball fetch itself off
+      # npmjs.org; corepack doesn't read .npmrc to find our registry.
+      - name: Enable pnpm
+        env:
+          COREPACK_NPM_REGISTRY: https://pkg.hanzo.ai
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # vite build transpiles without checking types, and a .vue SFC type
+      # error is the failure mode this codebase actually has (hanzo.yml's
+      # own test gate exists for the same reason). vite-plugin-dts also
+      # type-checks while rolling up the .d.ts, so build:types is a second,
+      # narrower gate on top of this one.
+      - run: pnpm typecheck
+      - run: pnpm build:types
+
+      - name: Publish if the tree is ahead of the registry
+        working-directory: dist
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          NAME=$(jq -r .name package.json)
+          NEW=$(jq -r .version package.json)
+          OLD=$(curl -sf "https://registry.npmjs.org/${NAME/\//%2f}" \
+                  | jq -r '."dist-tags".latest // "0.0.0"' 2>/dev/null || echo "0.0.0")
+
+          NEWEST=$(printf '%s\n%s\n' "$OLD" "$NEW" | sort -V | tail -1)
+          if [ "$OLD" = "$NEW" ] || [ "$NEWEST" != "$NEW" ]; then
+            echo "registry serves $OLD; tree is $NEW — nothing to publish."
+            exit 0
+          fi
+          echo "Publishing $NAME $OLD -> $NEW"
+          pnpm publish --access public --no-git-checks
+
+  # Publishes @hanzo-studio/desktop-ui. apps/desktop-ui/package.json is a
+  # private workspace member, not a publishable manifest, so the step below
+  # synthesizes the one that actually ships — same fields the old workflow
+  # read, from the same two sources (the app's own name/version, the
+  # workspace root's license/repository).
+  desktop-ui:
+    name: "@hanzo-studio/desktop-ui (npm)"
+    runs-on: hanzo-build-linux-amd64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Enable pnpm
+        env:
+          COREPACK_NPM_REGISTRY: https://pkg.hanzo.ai
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm typecheck
+      - name: Build Desktop UI
+        env:
+          ENABLE_MINIFY: 'true'
+        run: pnpm build:desktop
+
+      - name: Prepare the publishable package
+        id: pkg
+        run: |
+          set -euo pipefail
+          NAME=$(jq -r .name apps/desktop-ui/package.json)
+          VERSION=$(jq -r .version apps/desktop-ui/package.json)
+          LICENSE=$(jq -r .license package.json)
+          REPOSITORY=$(jq -r .repository package.json)
+
+          DIR=apps/desktop-ui/.npm-publish
+          rm -rf "$DIR"
+          mkdir -p "$DIR"
+          cp -R apps/desktop-ui/dist "$DIR/dist"
+          [ -f apps/desktop-ui/README.md ] && cp apps/desktop-ui/README.md "$DIR/README.md"
+
+          jq -n \
+            --arg name "$NAME" --arg version "$VERSION" \
+            --arg description "Static assets for the Hanzo Studio Desktop UI" \
+            --arg license "$LICENSE" --arg repository "$REPOSITORY" \
+            '{
+              name: $name,
+              version: $version,
+              description: $description,
+              license: $license,
+              repository: $repository,
+              type: "module",
+              private: false,
+              files: ["dist"],
+              publishConfig: { access: "public" }
+            }' > "$DIR/package.json"
+
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Publish if the tree is ahead of the registry
+        working-directory: ${{ steps.pkg.outputs.dir }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          NAME=$(jq -r .name package.json)
+          NEW=$(jq -r .version package.json)
+          OLD=$(curl -sf "https://registry.npmjs.org/${NAME/\//%2f}" \
+                  | jq -r '."dist-tags".latest // "0.0.0"' 2>/dev/null || echo "0.0.0")
+
+          NEWEST=$(printf '%s\n%s\n' "$OLD" "$NEW" | sort -V | tail -1)
+          if [ "$OLD" = "$NEW" ] || [ "$NEWEST" != "$NEW" ]; then
+            echo "registry serves $OLD; tree is $NEW — nothing to publish."
+            exit 0
+          fi
+          echo "Publishing $NAME $OLD -> $NEW"
+          pnpm publish --access public --no-git-checks
+
+  # Publishes hanzo-studio-frontend to PyPI: the same web build wrapped as a
+  # Python package (setup.py, static/ holds the built assets). Unlike the
+  # two npm jobs, the existing publish mechanism is a pinned third-party
+  # action rather than a bare CLI call, so it stays a separate step gated on
+  # the compare step's output instead of living inside one shell block.
+  pypi:
+    name: "hanzo-studio-frontend (PyPI)"
+    runs-on: hanzo-build-linux-amd64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        env:
+          COREPACK_NPM_REGISTRY: https://pkg.hanzo.ai
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # pnpm build runs typecheck before vite build, so this is the gate as
+      # well as the source of the static assets PyPI ships — it always
+      # runs, whether or not the version below turns out to be publishable.
+      - name: Build project
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+          ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+          ENABLE_MINIFY: 'true'
+          USE_PROD_CONFIG: 'true'
+        run: pnpm build
+
+      - name: Compare the tree against what PyPI already serves
+        id: compare
+        run: |
+          set -euo pipefail
+          NEW=$(jq -r .version package.json)
+          OLD=$(curl -sf "https://pypi.org/pypi/hanzo-studio-frontend/json" \
+                  | jq -r '.info.version // "0.0.0"' 2>/dev/null || echo "0.0.0")
+
+          NEWEST=$(printf '%s\n%s\n' "$OLD" "$NEW" | sort -V | tail -1)
+          if [ "$OLD" = "$NEW" ] || [ "$NEWEST" != "$NEW" ]; then
+            echo "registry serves $OLD; tree is $NEW — nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Building $NEW (PyPI has $OLD)"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "version=$NEW" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.compare.outputs.publish == 'true'
+        with:
+          python-version: '3.x'
+
+      # setup.py reads STUDIO_FRONTEND_VERSION (its own hardcoded fallback
+      # is a stale 1.30.6) — not COMFYUI_FRONTEND_VERSION, which the old
+      # workflow set and which this package no longer looks at.
+      - name: Build the sdist and wheel
+        if: steps.compare.outputs.publish == 'true'
+        env:
+          STUDIO_FRONTEND_VERSION: ${{ steps.compare.outputs.version }}
+        run: |
+          set -euo pipefail
+          python -m pip install build
+          mkdir -p hanzo-studio_frontend_package/hanzo-studio_frontend_package/static
+          cp -r dist/* hanzo-studio_frontend_package/hanzo-studio_frontend_package/static/
+          python -m build hanzo-studio_frontend_package
+
+      - name: Publish package
+        if: steps.compare.outputs.publish == 'true'
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+          packages-dir: hanzo-studio_frontend_package/dist
