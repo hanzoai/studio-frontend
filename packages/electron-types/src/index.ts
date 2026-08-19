@@ -3,7 +3,7 @@
 export enum DownloadStatus {
   IDLE = 'idle',
   PENDING = 'pending',
-  DOWNLOADING = 'downloading',
+  DOWNLOADING = 'in_progress',
   PAUSED = 'paused',
   COMPLETED = 'completed',
   ERROR = 'error',
@@ -57,7 +57,7 @@ export interface InstallStageInfo {
 
 export enum ProgressStatus {
   INITIAL_STATE = 'initial_state',
-  DOWNLOADING = 'downloading',
+  DOWNLOADING = 'in_progress',
   READY = 'ready',
   ERROR = 'error',
   STARTED = 'started'
@@ -136,11 +136,84 @@ export interface ElectronAPI {
   /** Event tracking */
   Events: {
     trackEvent: (name: string, data?: Record<string, unknown>) => void
+    incrementUserProperty: (name: string, value: number) => void
   }
 
-  /** Native context menu */
-  showContextMenu: () => void
+  /**
+   * Native context menu. The page passes what kind of thing was clicked so the
+   * shell can offer the right items; omitting it asks for the default menu.
+   */
+  showContextMenu: (options?: { type?: 'text' }) => void
 
-  /** Allow arbitrary additional properties */
-  [key: string]: unknown
+  /** The desktop shell's own version, shown in the about panel. */
+  getElectronVersion: () => Promise<string>
+
+  /** Runtime configuration the shell owns rather than the page. */
+  Config: {
+    setWindowStyle: (style: 'default' | 'custom') => void
+  }
+
+  /**
+   * Restart the app. The message and delay are what the shell shows while it
+   * waits, so a caller that has nothing to say passes neither.
+   */
+  restartApp: (message?: string, delay?: number) => void
+
+  /** Reinstall, and quit — each ends the current session. */
+  reinstall: () => void
+  quit: () => void
+
+  /** Ask the update channel, without letting it act on the answer. */
+  checkForUpdates: (options?: {
+    disableUpdateReadyAction?: boolean
+  }) => Promise<{
+    isUpdateAvailable: boolean
+    version?: string
+  }>
+
+  /** Apply an update already downloaded, which restarts the app. */
+  restartAndInstall: () => void
+
+  /** The OS, as node names it: 'darwin', 'win32', 'linux'. */
+  getPlatform: () => string
+
+  /** The app's own version, distinct from the shell's. */
+  getHanzoStudioVersion: () => string
+
+  /**
+   * Tint the native window chrome to match the page. `height` lets the shell
+   * align its drag region with a top menu the page has already laid out.
+   */
+  changeTheme: (theme: {
+    color: string
+    symbolColor: string
+    height?: number
+  }) => void
+
+  /** The shell's own network reach, which the page cannot test for itself. */
+  NetWork: {
+    canAccessUrl: (url: string) => Promise<boolean>
+  }
+
+  /** The pty behind the command terminal. */
+  Terminal: {
+    write: (data: string) => Promise<void>
+    resize: (cols: number, rows: number) => Promise<void>
+    /** Returns its own unsubscribe, called on unmount. */
+    onOutput: (callback: (message: string) => void) => () => void
+    /** Replays what the pty buffered while the panel was closed. */
+    restore: () => Promise<{
+      buffer: string[]
+      size: { cols: number; rows: number }
+    }>
+  }
+
+  /** Reveal a directory the shell owns in the OS file manager. */
+  openLogsFolder: () => void
+  openModelsFolder: () => void
+  openOutputsFolder: () => void
+  openInputsFolder: () => void
+  openCustomNodesFolder: () => void
+  openModelConfig: () => void
+  openDevTools: () => void
 }
