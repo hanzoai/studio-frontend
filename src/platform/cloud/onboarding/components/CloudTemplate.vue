@@ -19,7 +19,11 @@
         playsinline
         :poster="videoPoster"
       >
-        <source :src="videoSrc" type="video/mp4" />
+        <!-- Poster only. The mp4 this element used to name has never been in
+             this repository, on any ref, and upstream does not carry it either
+             — it was a file someone had locally. A <video> with a poster and no
+             playable source renders the poster, so the panel keeps its
+             background; restore the source here the day the asset exists. -->
       </video>
 
       <div class="absolute inset-0 h-full w-full bg-black/30"></div>
@@ -66,7 +70,6 @@ import Button from 'primevue/button'
 
 import { t } from '@/i18n'
 import videoPoster from '@/platform/cloud/onboarding/assets/videos/thumbnail.png'
-import videoSrc from '@/platform/cloud/onboarding/assets/videos/video.mp4'
 import CloudLogo from '@/platform/cloud/onboarding/components/CloudLogo.vue'
 import CloudTemplateFooter from '@/platform/cloud/onboarding/components/CloudTemplateFooter.vue'
 import BaseViewTemplate from '@/views/templates/BaseViewTemplate.vue'
