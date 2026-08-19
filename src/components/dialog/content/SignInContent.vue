@@ -87,7 +87,7 @@
           @click="showApiKeyForm = true"
         >
           <img
-            src="/assets/images/comfy-logo-mono.svg"
+            src="/assets/images/hanzo-logo-mono.svg"
             class="mr-2 h-5 w-5"
             :alt="$t('g.comfy')"
           />

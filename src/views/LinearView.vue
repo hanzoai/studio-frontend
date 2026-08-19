@@ -135,7 +135,7 @@ function openFeedback() {
         <img
           v-if="nodeOutputStore.latestOutput.length === 0"
           class="pointer-events-none object-contain flex-1 max-h-full brightness-50 opacity-10"
-          src="/assets/images/comfy-logo-mono.svg"
+          src="/assets/images/hanzo-logo-mono.svg"
         />
       </SplitterPanel>
       <SplitterPanel :size="1" class="flex flex-col gap-1 p-1 min-w-min">

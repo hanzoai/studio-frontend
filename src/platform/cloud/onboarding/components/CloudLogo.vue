@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto flex h-[7%] max-h-[70px] w-5/6 items-end">
     <img
-      src="/assets/images/comfy-cloud-logo.svg"
+      src="/assets/images/hanzo-cloud-logo.svg"
       alt="Comfy Cloud Logo"
       class="h-3/4 max-h-10 w-auto"
     />

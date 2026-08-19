@@ -83,7 +83,7 @@ export const NonInteractive: Story = {
 export const WithPreviewImage: Story = {
   args: {
     asset: createAssetData({
-      preview_url: '/assets/images/comfy-logo-single.svg'
+      preview_url: '/assets/images/hanzo-logo-single.svg'
     }),
     interactive: true
   },

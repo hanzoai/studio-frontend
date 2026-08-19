@@ -17,7 +17,7 @@ import type { ProxyOptions, UserConfig } from 'vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-import { hanzoAPIPlugin, generateImportMapPlugin } from './build/plugins'
+import { hanzoAPIPlugin } from './build/plugins'
 
 dotenvConfig()
 
@@ -318,46 +318,12 @@ export default defineConfig({
         }
       }
     },
-    // Skip import-map generation for cloud builds to keep bundle small
-    ...(DISTRIBUTION !== 'cloud'
-      ? [
-          generateImportMapPlugin([
-            {
-              name: 'vue',
-              pattern: 'vue',
-              entry: './dist/vue.esm-browser.prod.js'
-            },
-            {
-              name: 'vue-i18n',
-              pattern: 'vue-i18n',
-              entry: './dist/vue-i18n.esm-browser.prod.js'
-            },
-            {
-              name: 'primevue',
-              pattern: /^primevue\/?.*/,
-              entry: './index.mjs',
-              recursiveDependence: true
-            },
-            {
-              name: '@primevue/themes',
-              pattern: /^@primevue\/themes\/?.*/,
-              entry: './index.mjs',
-              recursiveDependence: true
-            },
-            {
-              name: '@primevue/forms',
-              pattern: /^@primevue\/forms\/?.*/,
-              entry: './index.mjs',
-              recursiveDependence: true,
-              override: {
-                '@primeuix/forms': {
-                  entry: ''
-                }
-              }
-            }
-          ])
-        ]
-      : []),
+    // No import map. Upstream removed `generateImportMapPlugin` in ADR-0005:
+    // externalising vue and primevue blocked tree shaking, split PrimeVue into
+    // hundreds of separately-requested chunks, and cost a round trip per module
+    // on cold start. The guard that used to sit here — skip it for cloud —
+    // already said the same thing more quietly, because a bundled distribution
+    // was the case the indirection could not serve at all.
 
     Icons({
       compiler: 'vue3',
