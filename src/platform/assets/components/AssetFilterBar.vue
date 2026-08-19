@@ -52,8 +52,6 @@ import { cn } from '@/utils/tailwindUtil'
 
 import type { FilterState } from './assetFilterBarTypes'
 
-export type { FilterState }
-
 const { assets = [] } = defineProps<{
   assets?: AssetItem[]
 }>()
