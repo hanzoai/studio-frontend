@@ -322,9 +322,18 @@ jobs:
           echo "::add-mask::$VAL"
           echo "PYPI_TOKEN=$VAL" >> "$GITHUB_ENV"
 
+      # twine directly, not pypa/gh-action-pypi-publish. That action's
+      # entrypoint reads GITHUB_WORKFLOW_REF, which exists only on GitHub — it
+      # is how their OIDC trusted publishing identifies the calling workflow.
+      # This forge does not set it, so the container died on "unbound variable"
+      # before it ever reached the upload, which is the whole reason this job
+      # has never published. twine wants the token and nothing else.
       - name: Publish package
         if: steps.compare.outputs.publish == 'true'
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
-        with:
-          password: ${{ env.PYPI_TOKEN }}
-          packages-dir: hanzo-studio_frontend_package/dist
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ env.PYPI_TOKEN }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --upgrade twine
+          python3 -m twine upload hanzo-studio_frontend_package/dist/*
