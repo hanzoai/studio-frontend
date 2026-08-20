@@ -82,11 +82,11 @@ jobs:
           KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
           KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
         run: |
-          # Only the KMS machine identity lives as a forge secret. A registry
+          # Only the KMS machine identity lives as an Actions secret. A registry
           # token beside it would be a second home for one thing, and the one
           # that rots unwatched — nothing reads it until a release day.
           if [ -z "${KMS_CLIENT_ID:-}" ] || [ -z "${KMS_CLIENT_SECRET:-}" ]; then
-            echo "::error::KMS machine identity absent — cannot pull the publish credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as git.hanzo.ai Actions secrets (org or repo scope)." >&2
+            echo "::error::KMS machine identity absent — cannot pull the publish credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as Hanzo Git Actions secrets (org or repo scope)." >&2
             exit 1
           fi
           KMS=https://kms.hanzo.ai; ENVN=prod
@@ -98,7 +98,7 @@ jobs:
           CODE=$(printf '%s' "$BODY" | tail -1)
           NODE_AUTH_TOKEN=$(printf '%s' "$BODY" | sed '$d' | jq -r '.value // empty' 2>/dev/null || true)
           if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed NPM_TOKEN there, not as a forge secret." >&2
+            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed NPM_TOKEN there, not as an Actions secret." >&2
             exit 1
           fi
           echo "::add-mask::$NODE_AUTH_TOKEN"
@@ -186,11 +186,11 @@ jobs:
           KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
           KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
         run: |
-          # Only the KMS machine identity lives as a forge secret. A registry
+          # Only the KMS machine identity lives as an Actions secret. A registry
           # token beside it would be a second home for one thing, and the one
           # that rots unwatched — nothing reads it until a release day.
           if [ -z "${KMS_CLIENT_ID:-}" ] || [ -z "${KMS_CLIENT_SECRET:-}" ]; then
-            echo "::error::KMS machine identity absent — cannot pull the publish credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as git.hanzo.ai Actions secrets (org or repo scope)." >&2
+            echo "::error::KMS machine identity absent — cannot pull the publish credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as Hanzo Git Actions secrets (org or repo scope)." >&2
             exit 1
           fi
           KMS=https://kms.hanzo.ai; ENVN=prod
@@ -202,7 +202,7 @@ jobs:
           CODE=$(printf '%s' "$BODY" | tail -1)
           NODE_AUTH_TOKEN=$(printf '%s' "$BODY" | sed '$d' | jq -r '.value // empty' 2>/dev/null || true)
           if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed NPM_TOKEN there, not as a forge secret." >&2
+            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed NPM_TOKEN there, not as an Actions secret." >&2
             exit 1
           fi
           echo "::add-mask::$NODE_AUTH_TOKEN"
@@ -300,11 +300,11 @@ jobs:
           KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
           KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
         run: |
-          # Only the KMS machine identity lives as a forge secret. The action
+          # Only the KMS machine identity lives as an Actions secret. The action
           # below takes the token as an input rather than an env var, so it is
           # read here and handed over through the job env, masked.
           if [ -z "${KMS_CLIENT_ID:-}" ] || [ -z "${KMS_CLIENT_SECRET:-}" ]; then
-            echo "::error::KMS machine identity absent — cannot pull the PyPI credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as git.hanzo.ai Actions secrets (org or repo scope)." >&2
+            echo "::error::KMS machine identity absent — cannot pull the PyPI credential. Seed KMS_CLIENT_ID/KMS_CLIENT_SECRET as Hanzo Git Actions secrets (org or repo scope)." >&2
             exit 1
           fi
           KMS=https://kms.hanzo.ai; ENVN=prod
@@ -316,7 +316,7 @@ jobs:
           CODE=$(printf '%s' "$BODY" | tail -1)
           VAL=$(printf '%s' "$BODY" | sed '$d' | jq -r '.value // empty' 2>/dev/null || true)
           if [ -z "$VAL" ]; then
-            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed PYPI_TOKEN there, not as a forge secret." >&2
+            echo "::error::KMS returned HTTP $CODE for $URL with no value — seed PYPI_TOKEN there, not as an Actions secret." >&2
             exit 1
           fi
           echo "::add-mask::$VAL"
@@ -325,7 +325,7 @@ jobs:
       # twine directly, not pypa/gh-action-pypi-publish. That action's
       # entrypoint reads GITHUB_WORKFLOW_REF, which exists only on GitHub — it
       # is how their OIDC trusted publishing identifies the calling workflow.
-      # This forge does not set it, so the container died on "unbound variable"
+      # Hanzo Git does not set it, so the container died on "unbound variable"
       # before it ever reached the upload, which is the whole reason this job
       # has never published. twine wants the token and nothing else.
       - name: Publish package
