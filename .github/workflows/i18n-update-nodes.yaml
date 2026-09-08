@@ -11,7 +11,7 @@ on:
 
 jobs:
   update-locales:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5

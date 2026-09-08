@@ -11,7 +11,7 @@ on:
 jobs:
   resolve:
     name: Resolve Version and Dist Tag
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: >
       github.event.pull_request.merged == true &&
       contains(github.event.pull_request.labels.*.name, 'Release')
@@ -64,7 +64,7 @@ jobs:
       - resolve
       - publish
     if: success()
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     permissions:
       contents: read
       issues: write

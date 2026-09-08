@@ -13,7 +13,7 @@ jobs:
   update-locales:
     # Branch detection: Only run for manual dispatch or version-bump-* branches from main repo
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'version-bump-'))
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5

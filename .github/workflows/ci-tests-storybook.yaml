@@ -9,7 +9,7 @@ on:
 jobs:
   # Post starting comment for non-forked PRs
   comment-on-pr-start:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
     permissions:
       pull-requests: write
@@ -30,7 +30,7 @@ jobs:
 
   # Build Storybook for all PRs (free Cloudflare deployment)
   storybook-build:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: github.event_name == 'pull_request'
     outputs:
       conclusion: ${{ steps.job-status.outputs.conclusion }}
@@ -78,7 +78,7 @@ jobs:
 
   # Chromatic deployment only for version-bump-* branches or manual triggers
   chromatic-deployment:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-deploy-linux-amd64
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'version-bump-'))
     outputs:
       conclusion: ${{ steps.job-status.outputs.conclusion }}
@@ -130,7 +130,7 @@ jobs:
   # Deploy and comment for non-forked PRs only
   deploy-and-comment:
     needs: [storybook-build]
-    runs-on: ubuntu-latest
+    runs-on: hanzo-deploy-linux-amd64
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false && always()
     permissions:
       pull-requests: write
@@ -186,7 +186,7 @@ jobs:
   # Update comment with Chromatic URLs for version-bump branches
   update-comment-with-chromatic:
     needs: [chromatic-deployment, deploy-and-comment]
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false && startsWith(github.head_ref, 'version-bump-') && needs.chromatic-deployment.outputs.chromatic-build-url != ''
     permissions:
       pull-requests: write

@@ -36,7 +36,7 @@ concurrency:
 jobs:
   publish_types_manual:
     name: Publish @hanzo-studio/studio-frontend-types
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     permissions:
       contents: read
     steps:

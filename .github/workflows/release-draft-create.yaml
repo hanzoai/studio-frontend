@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: >
       github.event.pull_request.merged == true &&
       contains(github.event.pull_request.labels.*.name, 'Release')
@@ -64,7 +64,7 @@ jobs:
 
   draft_release:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -95,7 +95,7 @@ jobs:
 
   publish_pypi:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -140,7 +140,7 @@ jobs:
       - publish_pypi
       - publish_types
     if: success()
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     permissions:
       contents: read
       issues: write
