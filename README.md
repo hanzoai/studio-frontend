@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/hero.svg" alt="studio-frontend" width="880"></p>
+
 <div align="center">
 
 # studio-frontend
