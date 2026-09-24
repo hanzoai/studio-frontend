@@ -10,7 +10,7 @@ class RemoteWidgetNode:
                     "COMBO",
                     {
                         "remote": {
-                            "route": "/api/models/checkpoints",
+                            "route": "/v1/models/checkpoints",
                         },
                     },
                 ),
@@ -35,7 +35,7 @@ class RemoteWidgetNodeWithParams:
                     "COMBO",
                     {
                         "remote": {
-                            "route": "/api/models/checkpoints",
+                            "route": "/v1/models/checkpoints",
                             "query_params": {
                                 "sort": "true",
                             },
@@ -65,7 +65,7 @@ class RemoteWidgetNodeWithRefresh:
                     "COMBO",
                     {
                         "remote": {
-                            "route": "/api/models/checkpoints",
+                            "route": "/v1/models/checkpoints",
                             "refresh": 300,
                             "max_retries": 10,
                             "timeout": 256,
@@ -93,7 +93,7 @@ class RemoteWidgetNodeWithRefreshButton:
                     "COMBO",
                     {
                         "remote": {
-                            "route": "/api/models/checkpoints",
+                            "route": "/v1/models/checkpoints",
                             "refresh_button": True,
                         },
                     },
@@ -119,7 +119,7 @@ class RemoteWidgetNodeWithControlAfterRefresh:
                     "COMBO",
                     {
                         "remote": {
-                            "route": "/api/models/checkpoints",
+                            "route": "/v1/models/checkpoints",
                             "refresh_button": True,
                             "control_after_refresh": "first",
                         },

@@ -84,7 +84,7 @@ const handleFileUpload = async (event: Event) => {
           type: 'input',
           subfolder: 'backgrounds'
         })
-        modelValue.value = `/api/view?${params.toString()}`
+        modelValue.value = `/v1/view?${params.toString()}`
       }
     } catch (error) {
       useToastStore().addAlert(`Upload error: ${String(error)}`)

@@ -128,7 +128,7 @@ describe('downloadUtil', () => {
     })
 
     it('should handle relative URLs by using window.location.origin', () => {
-      const relativeUrl = '/api/file?filename=relative-image.png'
+      const relativeUrl = '/v1/file?filename=relative-image.png'
 
       downloadFile(relativeUrl)
 

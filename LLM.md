@@ -116,6 +116,13 @@ if (api.serverSupportsFeature('feature_name')) {  // Check capability
 const value = api.getServerFeature('config_name', defaultValue)  // Get config
 ```
 
+**API prefix:** the server answers under `/v1`, so `api.apiURL(route)` is
+`api_base + '/v1' + route`, and a same-origin literal names `/v1/...`, never
+`/api/...`. `tests-ui/tests/apiPrefix.test.ts` fails on any `/api` literal in
+`src/`. The live studio.hanzo.ai UI is the upstream `comfyui-frontend-package`
+that hanzoai/studio patches the same way at image build
+(`branding/patch_apibase.py`); this tree is not what it ships.
+
 **Documentation:**
 - Settings system: `docs/SETTINGS.md`
 - Feature flags system: `docs/FEATURE_FLAGS.md`

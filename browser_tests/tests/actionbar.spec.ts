@@ -29,7 +29,7 @@ test.describe('Actionbar', () => {
 
     // Intercept the prompt queue endpoint
     let promptNumber = 0
-    await comfyPage.page.route('**/api/prompt', async (route, req) => {
+    await comfyPage.page.route('**/v1/prompt', async (route, req) => {
       await new Promise((r) => setTimeout(r, 100))
       await route.fulfill({
         status: 200,
@@ -44,7 +44,7 @@ test.describe('Actionbar', () => {
     })
 
     // Start watching for a message to prompt
-    const requestPromise = comfyPage.page.waitForResponse('**/api/prompt')
+    const requestPromise = comfyPage.page.waitForResponse('**/v1/prompt')
 
     // Find and set the width on the latent node
     const triggerChange = async (value: number) => {
@@ -94,7 +94,7 @@ test.describe('Actionbar', () => {
 
     // Ensure that no other changes are queued
     await expect(
-      comfyPage.page.waitForResponse('**/api/prompt', { timeout: 250 })
+      comfyPage.page.waitForResponse('**/v1/prompt', { timeout: 250 })
     ).rejects.toThrow()
     expect(
       promptNumber,
@@ -107,7 +107,7 @@ test.describe('Actionbar', () => {
 
     // Ensure the queued width is the last queued value
     expect(
-      await getQueuedWidth(comfyPage.page.waitForResponse('**/api/prompt')),
+      await getQueuedWidth(comfyPage.page.waitForResponse('**/v1/prompt')),
       'last queued prompt width should be the last change'
     ).toBe(END)
     expect(promptNumber, 'queued prompt count should be 2').toBe(2)

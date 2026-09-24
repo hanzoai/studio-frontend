@@ -165,8 +165,8 @@ export class SceneManager implements SceneManagerInterface {
 
     let imageUrl = Load3dUtils.getResourceURL(...pathParts, type)
 
-    if (!imageUrl.startsWith('/api')) {
-      imageUrl = '/api' + imageUrl
+    if (!imageUrl.startsWith('/v1')) {
+      imageUrl = '/v1' + imageUrl
     }
 
     try {

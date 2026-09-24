@@ -61,7 +61,7 @@ test.describe('Remote COMBO Widget', () => {
     test.beforeEach(async ({ comfyPage }) => {
       await comfyPage.setSetting('Comfy.UseNewMenu', 'Top')
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route, request) => {
           const params = new URL(request.url()).searchParams
           const sort = params.get('sort')
@@ -74,7 +74,7 @@ test.describe('Remote COMBO Widget', () => {
     })
 
     test.afterEach(async ({ comfyPage }) => {
-      await comfyPage.page.unroute('**/api/models/checkpoints**')
+      await comfyPage.page.unroute('**/v1/models/checkpoints**')
     })
 
     test('lazy loads options when widget is added from node library', async ({
@@ -115,7 +115,7 @@ test.describe('Remote COMBO Widget', () => {
 
     test('handles empty list of options', async ({ comfyPage }) => {
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           await route.fulfill({ body: JSON.stringify([]), status: 200 })
         }
@@ -132,7 +132,7 @@ test.describe('Remote COMBO Widget', () => {
       comfyPage
     }) => {
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           await route.fulfill({ status: 500 })
         }
@@ -155,7 +155,7 @@ test.describe('Remote COMBO Widget', () => {
       let requestWasMade = false
 
       comfyPage.page.on('request', (request) => {
-        if (request.url().includes('/api/models/checkpoints')) {
+        if (request.url().includes('/v1/models/checkpoints')) {
           requestWasMade = true
         }
       })
@@ -169,11 +169,11 @@ test.describe('Remote COMBO Widget', () => {
       comfyPage
     }) => {
       const requestPromise = comfyPage.page.waitForRequest((request) =>
-        request.url().includes('/api/models/checkpoints')
+        request.url().includes('/v1/models/checkpoints')
       )
       await addRemoteWidgetNode(comfyPage, 'Remote Widget Node')
       const request = await requestPromise
-      expect(request.url()).toContain('/api/models/checkpoints')
+      expect(request.url()).toContain('/v1/models/checkpoints')
     })
   })
 
@@ -200,7 +200,7 @@ test.describe('Remote COMBO Widget', () => {
     test('refreshes options when TTL expires', async ({ comfyPage }) => {
       // Fulfill each request with a unique timestamp
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route, request) => {
           await route.fulfill({
             body: JSON.stringify([Date.now()]),
@@ -231,7 +231,7 @@ test.describe('Remote COMBO Widget', () => {
     test('does not refresh when TTL is not set', async ({ comfyPage }) => {
       let requestCount = 0
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           requestCount++
           await route.fulfill({ body: JSON.stringify(['test']), status: 200 })
@@ -254,7 +254,7 @@ test.describe('Remote COMBO Widget', () => {
     test('retries failed requests with backoff', async ({ comfyPage }) => {
       const timestamps: number[] = []
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           timestamps.push(Date.now())
           await route.fulfill({ status: 500 })
@@ -280,7 +280,7 @@ test.describe('Remote COMBO Widget', () => {
 
     test('clicking refresh button forces a refresh', async ({ comfyPage }) => {
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           await route.fulfill({
             body: JSON.stringify([`${Date.now()}`]),
@@ -312,7 +312,7 @@ test.describe('Remote COMBO Widget', () => {
         ['new first option', 'first option', 'second option', 'third option']
       ]
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           const next = options.shift()
           await route.fulfill({
@@ -345,7 +345,7 @@ test.describe('Remote COMBO Widget', () => {
     }) => {
       let requestCount = 0
       await comfyPage.page.route(
-        '**/api/models/checkpoints**',
+        '**/v1/models/checkpoints**',
         async (route) => {
           requestCount++
           await route.fulfill({

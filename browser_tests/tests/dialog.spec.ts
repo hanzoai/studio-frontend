@@ -74,7 +74,7 @@ test.describe('Missing models warning', () => {
   test.beforeEach(async ({ comfyPage }) => {
     await comfyPage.setSetting('Comfy.Workflow.ShowMissingModelsWarning', true)
     await comfyPage.page.evaluate((url: string) => {
-      return fetch(`${url}/api/devtools/cleanup_fake_model`)
+      return fetch(`${url}/v1/devtools/cleanup_fake_model`)
     }, comfyPage.url)
   })
 
@@ -124,7 +124,7 @@ test.describe('Missing models warning', () => {
       ])
     }
     await comfyPage.page.route(
-      '**/api/experiment/models',
+      '**/v1/experiment/models',
       (route) => route.fulfill(modelFoldersRes),
       { times: 1 }
     )
@@ -142,7 +142,7 @@ test.describe('Missing models warning', () => {
       ])
     }
     await comfyPage.page.route(
-      '**/api/experiment/models/text_encoders',
+      '**/v1/experiment/models/text_encoders',
       (route) => route.fulfill(clipModelsRes),
       { times: 1 }
     )
@@ -206,7 +206,7 @@ test.describe('Missing models warning', () => {
     }) => {
       await checkbox.click()
       const changeSettingPromise = comfyPage.page.waitForRequest(
-        '**/api/settings/Comfy.Workflow.ShowMissingModelsWarning'
+        '**/v1/settings/Comfy.Workflow.ShowMissingModelsWarning'
       )
       await closeButton.click()
       await changeSettingPromise
@@ -285,7 +285,7 @@ test.describe('Settings', () => {
     await input.press('Alt+n')
 
     const requestPromise = comfyPage.page.waitForRequest(
-      '**/api/settings/Comfy.Keybinding.NewBindings'
+      '**/v1/settings/Comfy.Keybinding.NewBindings'
     )
 
     // Save keybinding

@@ -198,7 +198,7 @@ export const useExampleStore = defineStore('example', () => {
     error.value = null
 
     try {
-      const response = await fetch('/api/items')
+      const response = await fetch('/v1/items')
       const data = await response.json()
       items.value = data
     } catch (err) {

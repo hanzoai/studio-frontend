@@ -230,7 +230,7 @@ describe('useLoad3d', () => {
         'test.glb'
       ])
       vi.mocked(Load3dUtils.getResourceURL).mockReturnValue(
-        '/api/view/test.glb'
+        '/v1/view/test.glb'
       )
       vi.mocked(api.apiURL).mockReturnValue(
         'http://localhost/api/view/test.glb'
@@ -257,7 +257,7 @@ describe('useLoad3d', () => {
         'test.glb'
       ])
       vi.mocked(Load3dUtils.getResourceURL).mockReturnValue(
-        '/api/view/test.glb'
+        '/v1/view/test.glb'
       )
       vi.mocked(api.apiURL).mockReturnValue(
         'http://localhost/api/view/test.glb'
@@ -824,7 +824,7 @@ describe('useLoad3d', () => {
         'test.glb'
       ])
       vi.mocked(Load3dUtils.getResourceURL).mockReturnValue(
-        '/api/view/models/test.glb'
+        '/v1/view/models/test.glb'
       )
       vi.mocked(api.apiURL).mockReturnValue(
         'http://localhost/api/view/models/test.glb'
@@ -841,7 +841,7 @@ describe('useLoad3d', () => {
         'test.glb',
         'input'
       )
-      expect(api.apiURL).toHaveBeenCalledWith('/api/view/models/test.glb')
+      expect(api.apiURL).toHaveBeenCalledWith('/v1/view/models/test.glb')
       expect(mockLoad3d.loadModel).toHaveBeenCalledWith(
         'http://localhost/api/view/models/test.glb'
       )
@@ -851,7 +851,7 @@ describe('useLoad3d', () => {
       mockNode.widgets = [{ name: 'model_file', value: 'test.glb' }] // No width/height widgets
       vi.mocked(Load3dUtils.splitFilePath).mockReturnValue(['', 'test.glb'])
       vi.mocked(Load3dUtils.getResourceURL).mockReturnValue(
-        '/api/view/test.glb'
+        '/v1/view/test.glb'
       )
       vi.mocked(api.apiURL).mockReturnValue(
         'http://localhost/api/view/test.glb'

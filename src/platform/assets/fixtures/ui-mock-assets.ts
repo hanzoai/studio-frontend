@@ -111,7 +111,7 @@ export function createMockAssets(count: number = 20): AssetItem[] {
         ...(Math.random() > 0.5 ? ['demo-mode'] : ['test-only']),
         ...(Math.random() > 0.7 ? ['obviously-mock'] : [])
       ],
-      preview_url: `/api/assets/mock-asset-uuid-${(index + 1).toString().padStart(3, '0')}-fake/content`,
+      preview_url: `/v1/assets/mock-asset-uuid-${(index + 1).toString().padStart(3, '0')}-fake/content`,
       created_at: createdAt,
       updated_at: updatedAt,
       last_access_time: lastAccessTime,

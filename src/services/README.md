@@ -279,7 +279,7 @@ export function useCachedService() {
     }
 
     // Perform new request
-    const requestPromise = fetch(`/api/${key}`)
+    const requestPromise = fetch(`/v1/${key}`)
       .then(response => response.json())
       .then(data => {
         cache.set(key, data)

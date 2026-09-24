@@ -328,7 +328,7 @@ function getMediaUrl(
   type: 'input' | 'output' = 'input'
 ): string {
   if (!['image', 'video'].includes(props.assetKind ?? '')) return ''
-  return `/api/view?filename=${encodeURIComponent(filename)}&type=${type}`
+  return `/v1/view?filename=${encodeURIComponent(filename)}&type=${type}`
 }
 </script>
 

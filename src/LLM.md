@@ -19,7 +19,7 @@ const template = await fetch(api.fileURL('/templates/default.json'))
 #### ❌ Incorrect Usage
 ```typescript
 // WRONG - Direct URL construction
-const response = await fetch('/api/prompt')
+const response = await fetch('/v1/prompt')
 const template = await fetch('/templates/default.json')
 ```
 

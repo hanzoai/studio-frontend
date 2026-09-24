@@ -161,24 +161,24 @@ export default defineConfig({
 
       ...(DISTRIBUTION === 'cloud'
         ? {
-            '/api/view': gcsRedirectProxyConfig,
-            '/api/viewvideo': gcsRedirectProxyConfig
+            '/v1/view': gcsRedirectProxyConfig,
+            '/v1/viewvideo': gcsRedirectProxyConfig
           }
         : {}),
 
-      '/api': {
+      '/v1': {
         target: DEV_SERVER_COMFYUI_URL,
         ...cloudProxyConfig,
         bypass: (req, res, _options) => {
           // Return empty array for extensions API as these modules
           // are not on vite's dev server.
-          if (req.url === '/api/extensions') {
+          if (req.url === '/v1/extensions') {
             res.end(JSON.stringify([]))
             return false
           }
 
           // Bypass multi-user auth check from staging (cloud only)
-          if (DISTRIBUTION === 'cloud' && req.url === '/api/users') {
+          if (DISTRIBUTION === 'cloud' && req.url === '/v1/users') {
             res.setHeader('Content-Type', 'application/json')
             res.end(JSON.stringify({})) // Return empty object to simulate single-user mode
             return false

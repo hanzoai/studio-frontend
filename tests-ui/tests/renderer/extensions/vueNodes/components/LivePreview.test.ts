@@ -23,7 +23,7 @@ const i18n = createI18n({
 
 describe('LivePreview', () => {
   const defaultProps = {
-    imageUrl: '/api/view?filename=test_sample.png&type=temp'
+    imageUrl: '/v1/view?filename=test_sample.png&type=temp'
   }
 
   const mountLivePreview = (props = {}) => {

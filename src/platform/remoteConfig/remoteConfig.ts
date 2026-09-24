@@ -36,7 +36,7 @@ export function configValueOrDefault<K extends keyof RemoteConfig>(
  */
 export async function loadRemoteConfig(): Promise<void> {
   try {
-    const response = await fetch('/api/features', { cache: 'no-store' })
+    const response = await fetch('/v1/features', { cache: 'no-store' })
     if (response.ok) {
       const config = await response.json()
       window.__CONFIG__ = config

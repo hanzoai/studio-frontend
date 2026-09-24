@@ -372,7 +372,7 @@ test.describe('Feature Flags', () => {
   }) => {
     // Test the HTTP endpoint directly
     const response = await comfyPage.page.request.get(
-      `${comfyPage.url}/api/features`
+      `${comfyPage.url}/v1/features`
     )
     expect(response.ok()).toBe(true)
 

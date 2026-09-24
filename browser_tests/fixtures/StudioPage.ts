@@ -210,7 +210,7 @@ export class ComfyPage {
 
   async setupWorkflowsDirectory(structure: FolderStructure) {
     const resp = await this.request.post(
-      `${this.url}/api/devtools/setup_folder_structure`,
+      `${this.url}/v1/devtools/setup_folder_structure`,
       {
         data: {
           tree_structure: this.convertLeafToContent(structure),
@@ -231,7 +231,7 @@ export class ComfyPage {
   }
 
   async setupUser(username: string) {
-    const res = await this.request.get(`${this.url}/api/users`)
+    const res = await this.request.get(`${this.url}/v1/users`)
     if (res.status() !== 200)
       throw new Error(`Failed to retrieve users: ${await res.text()}`)
 
@@ -245,7 +245,7 @@ export class ComfyPage {
   }
 
   async createUser(username: string) {
-    const resp = await this.request.post(`${this.url}/api/users`, {
+    const resp = await this.request.post(`${this.url}/v1/users`, {
       data: { username }
     })
 
@@ -257,7 +257,7 @@ export class ComfyPage {
 
   async setupSettings(settings: Record<string, any>) {
     const resp = await this.request.post(
-      `${this.url}/api/devtools/set_settings`,
+      `${this.url}/v1/devtools/set_settings`,
       {
         data: settings
       }

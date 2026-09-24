@@ -4,7 +4,7 @@ This directory contains development tools and test utilities for Hanzo Studio, p
 
 ## Contents
 
-- `__init__.py` - Server endpoints for development tools (`/api/devtools/*`)
+- `__init__.py` - Server endpoints for development tools (`/v1/devtools/*`)
 - `dev_nodes.py` - Development and testing nodes for Hanzo Studio
 - `fake_model.safetensors` - Test fixture for model loading tests
 

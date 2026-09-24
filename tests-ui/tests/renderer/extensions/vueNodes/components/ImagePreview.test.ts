@@ -37,8 +37,8 @@ const i18n = createI18n({
 describe('ImagePreview', () => {
   const defaultProps = {
     imageUrls: [
-      '/api/view?filename=test1.png&type=output',
-      '/api/view?filename=test2.png&type=output'
+      '/v1/view?filename=test1.png&type=output',
+      '/v1/view?filename=test2.png&type=output'
     ]
   }
 

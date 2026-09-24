@@ -163,7 +163,7 @@ describe('api.fetchApi', () => {
       await api.fetchApi('/test/route')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/test/route'),
+        expect.stringContaining('/v1/test/route'),
         expect.any(Object)
       )
     })

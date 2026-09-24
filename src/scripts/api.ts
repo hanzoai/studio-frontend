@@ -337,7 +337,7 @@ export class ComfyApi extends EventTarget {
   }
 
   apiURL(route: string): string {
-    return this.api_base + '/api' + route
+    return this.api_base + '/v1' + route
   }
 
   fileURL(route: string): string {

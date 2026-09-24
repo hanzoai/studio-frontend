@@ -67,7 +67,7 @@ describe('useAssetWidgetData (cloud mode, isCloud=true)', () => {
         'asset-1',
         'Beautiful Model',
         'models/beautiful_model.safetensors',
-        '/api/preview/asset-1'
+        '/v1/preview/asset-1'
       ),
       createMockAsset('asset-2', 'Model B', 'model_b.safetensors', '/preview/2')
     ]
@@ -100,7 +100,7 @@ describe('useAssetWidgetData (cloud mode, isCloud=true)', () => {
     expect(item.id).toBe('asset-1')
     expect(item.name).toBe('models/beautiful_model.safetensors')
     expect(item.label).toBe('Beautiful Model')
-    expect(item.mediaSrc).toBe('/api/preview/asset-1')
+    expect(item.mediaSrc).toBe('/v1/preview/asset-1')
   })
 
   it('handles API errors gracefully', async () => {

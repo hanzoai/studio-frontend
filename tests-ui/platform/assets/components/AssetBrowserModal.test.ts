@@ -160,7 +160,7 @@ describe('AssetBrowserModal', () => {
     size: 1024000,
     mime_type: 'application/octet-stream',
     tags: ['models', category, 'test'],
-    preview_url: `/api/assets/${id}/content`,
+    preview_url: `/v1/assets/${id}/content`,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
     last_access_time: '2024-01-01T00:00:00Z',

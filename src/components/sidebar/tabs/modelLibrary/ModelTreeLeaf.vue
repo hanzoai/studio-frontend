@@ -46,7 +46,7 @@ const modelPreviewUrl = computed(() => {
   const extension = modelDef.value.file_name.split('.').pop()
   const filename = modelDef.value.file_name.replace(`.${extension}`, '.webp')
   const encodedFilename = encodeURIComponent(filename).replace(/%2F/g, '/')
-  return `/api/experiment/models/preview/${folder}/${path_index}/${encodedFilename}`
+  return `/v1/experiment/models/preview/${folder}/${path_index}/${encodedFilename}`
 })
 
 const previewRef = ref<InstanceType<typeof ModelPreview> | null>(null)
